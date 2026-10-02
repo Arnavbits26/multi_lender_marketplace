@@ -1,0 +1,90 @@
+\documentclass[10pt]{article}
+\usepackage[margin=0.85in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{cmap}
+\usepackage{titlesec}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage[hidelinks]{hyperref}
+\definecolor{DeepBlue}{RGB}{10,5,90}
+\titleformat{\section}{\color{DeepBlue}\large\bfseries}{}{0em}{}
+\titleformat{\subsection}{\bfseries}{}{0em}{}
+\setlength{\parskip}{5pt}
+\setlength{\parindent}{0pt}
+
+\begin{document}
+
+{\LARGE \textbf{\color{DeepBlue} Product Requirements Document}}\\
+{\Large Multi-Lender Student Financing Marketplace}\\
+\textit{Status: MVP built and tested \quad Owner: Arnav \quad Version: 1.0}
+
+\section*{1. Problem Statement}
+Students seeking education financing must currently approach lenders one at a time, with no way to compare eligibility or terms upfront. This creates two problems: students waste time applying to lenders they don't qualify for, and they have no way to know whether they're getting a competitive rate before committing.
+
+\section*{2. Goal}
+Let a student enter their financial profile once and immediately see every partner lender they're eligible for, ranked by estimated cost, with a clear reason given for any lender they don't qualify for.
+
+\section*{3. Personas}
+\textbf{Primary: The Applying Student.} Needs to borrow between Rs.~50K and Rs.~25L for tuition, often has thin or developing credit, and doesn't know which lenders will even consider their application.
+
+\textbf{Secondary: The Partner Lender.} Wants qualified leads only --- applicants who already meet their underwriting criteria, reducing wasted review effort on their side.
+
+\section*{4. User Stories}
+\begin{itemize}[leftmargin=18pt, itemsep=3pt]
+\item As a student, I want to enter my loan amount, credit standing, and desired tenure once, so that I don't have to repeat this for every lender.
+\item As a student, I want to see which lenders I'm eligible for and which I'm not, with a clear reason for rejection, so I don't waste time on a dead-end application.
+\item As a student with thin credit, I want to know if adding a co-signer would unlock additional lenders, so I can make an informed decision before applying.
+\item As a student, I want offers ranked by estimated interest rate, so the best available option is obvious without manual comparison.
+\item As a product owner, I want every step of this journey logged as an event, so we can see where applicants drop off and improve the funnel.
+\end{itemize}
+
+\section*{5. Functional Requirements}
+\begin{enumerate}[leftmargin=18pt, itemsep=3pt]
+\item The system shall accept an applicant's requested loan amount, credit tier, requested tenure, and co-signer availability.
+\item The system shall evaluate the applicant against all active partner lenders' underwriting rules (minimum credit tier, loan amount range, maximum tenure, co-signer conditions).
+\item The system shall return a ranked list of eligible offers, sorted by estimated interest rate (ascending), and a separate list of ineligible partners with a specific, human-readable rejection reason for each.
+\item The system shall log an analytics event at each of the four funnel stages: eligibility checked, offers viewed, partner selected, application initiated.
+\item The system shall expose a funnel summary endpoint returning real, queried conversion counts at each stage.
+\end{enumerate}
+
+\section*{6. Partner Rules Modelled (MVP scope: 4 partners)}
+\begin{center}
+\small
+\begin{tabular}{lllll}
+\toprule
+\textbf{Partner} & \textbf{Min. Credit} & \textbf{Amount Range} & \textbf{Max Tenure} & \textbf{Rate Range} \\
+\midrule
+EduFund Direct & Fair & Rs.~50K -- Rs.~15L & 7 yrs & 10.5--13.5\% \\
+ScholarBridge Finance & Good & Rs.~1L -- Rs.~20L & 10 yrs & 8.75--11.0\% \\
+CampusCredit Co-op & Thin File* & Rs.~50K -- Rs.~8L & 5 yrs & 12.0--15.0\% \\
+NextGen Education Loans & Good & Rs.~2L -- Rs.~25L & 15 yrs & 7.5--10.0\% \\
+\bottomrule
+\end{tabular}
+
+\vspace{4pt}
+\footnotesize *Thin File accepted only with a co-signer.
+\end{center}
+
+\section*{7. Success Metrics (KPIs)}
+\begin{itemize}[leftmargin=18pt, itemsep=3pt]
+\item \textbf{Eligibility-to-offers-viewed rate} --- did the applicant see any real offers, or hit a dead end?
+\item \textbf{Offers-viewed-to-partner-selected rate} --- of those with eligible offers, how many engaged further?
+\item \textbf{Partner-selected-to-application-initiated rate} --- the hardest conversion: intent to action.
+\item \textbf{Co-signer unlock rate} --- how often a co-signer prompt converts an otherwise-ineligible applicant.
+\end{itemize}
+
+\section*{8. MVP Scope}
+\textbf{In scope:} 4 simulated partners with distinct, realistic underwriting rules; real-time eligibility and rate-ranking logic; full funnel event instrumentation; a queryable funnel analytics endpoint.
+
+\textbf{Out of scope for MVP:} real partner API integrations, actual credit bureau pulls, document upload and verification, loan servicing post-approval.
+
+\section*{9. Roadmap (Post-MVP)}
+\begin{enumerate}[leftmargin=18pt, itemsep=2pt]
+\item Replace simulated partner rules with real partner API contracts.
+\item Add a soft credit-check integration to replace self-reported credit tier.
+\item A/B test the co-signer prompt's placement and wording to improve the unlock rate.
+\item Add segment-level funnel breakdowns (by credit tier, requested amount band) to the analytics endpoint.
+\end{enumerate}
+
+\end{document}

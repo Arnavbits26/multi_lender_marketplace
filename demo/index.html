@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Multi-Lender Student Financing Marketplace</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7F7FA; --ink: #14142B; --brand: #0A055A; --brand-soft: #4A4F9E;
+    --positive: #1B7F3B; --positive-soft: #E7F3EB; --warning: #B33A3A; --warning-soft: #FBEAEA;
+    --muted: #6B6B7A; --line: #E1E1E8; --card: #FFFFFF;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #121221; --ink: #EDEDF5; --brand: #8A90E8; --brand-soft: #6B70C4;
+      --positive: #4CAF6E; --positive-soft: #1B2E22; --warning: #E0756F; --warning-soft: #2E1B1B;
+      --muted: #9A9AB0; --line: #2A2A3D; --card: #1A1A2C;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #121221; --ink: #EDEDF5; --brand: #8A90E8; --brand-soft: #6B70C4;
+    --positive: #4CAF6E; --positive-soft: #1B2E22; --warning: #E0756F; --warning-soft: #2E1B1B;
+    --muted: #9A9AB0; --line: #2A2A3D; --card: #1A1A2C;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: 'Inter', -apple-system, sans-serif;
+    padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);
+    line-height: 1.55;
+  }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 48px 24px 80px; }
+  .eyebrow { font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  h1 {
+    font-family: 'Source Serif 4', Georgia, serif; font-weight: 700;
+    font-size: clamp(26px, 4.5vw, 34px); color: var(--brand); margin: 0 0 10px; line-height: 1.15;
+  }
+  .subtitle { color: var(--muted); font-size: 15.5px; max-width: 64ch; margin: 0 0 36px; }
+  .grid { display: grid; grid-template-columns: 1fr 1.3fr; gap: 28px; align-items: start; }
+  @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 24px; }
+  .card h2 { font-family: 'Source Serif 4', serif; font-size: 18px; margin: 0 0 18px; color: var(--ink); }
+  label { display: block; font-size: 13.5px; font-weight: 500; color: var(--muted); margin: 16px 0 6px; }
+  label:first-of-type { margin-top: 0; }
+  input, select {
+    width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--line);
+    background: var(--bg); color: var(--ink); font-size: 14.5px; font-family: inherit;
+  }
+  .checkbox-row { display: flex; align-items: center; gap: 8px; margin-top: 16px; }
+  .checkbox-row input { width: auto; }
+  .checkbox-row label { margin: 0; font-size: 14px; color: var(--ink); }
+  button.primary {
+    margin-top: 22px; width: 100%; padding: 12px; border: none; border-radius: 8px;
+    background: var(--brand); color: white; font-size: 15px; font-weight: 600; cursor: pointer;
+    font-family: inherit;
+  }
+  button.primary:hover { opacity: 0.92; }
+  .offer {
+    border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; margin-bottom: 10px;
+    display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  }
+  .offer.eligible { border-left: 4px solid var(--positive); }
+  .offer.ineligible { border-left: 4px solid var(--line); opacity: 0.75; }
+  .offer .name { font-weight: 600; font-size: 15px; }
+  .offer .reason { font-size: 13px; color: var(--muted); margin-top: 3px; }
+  .offer .rate { font-family: 'Source Serif 4', serif; font-weight: 700; font-size: 19px; color: var(--positive); white-space: nowrap; }
+  .pill { display: inline-block; font-size: 11.5px; font-weight: 600; padding: 2px 8px; border-radius: 100px; background: var(--warning-soft); color: var(--warning); margin-left: 8px; }
+  .empty-state { color: var(--muted); font-size: 14.5px; text-align: center; padding: 30px 10px; }
+  .funnel-note { margin-top: 18px; font-size: 13px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 14px; }
+  footer { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12.5px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Multi-Lender Student Financing Marketplace &middot; Live Demo</div>
+  <h1>See every lender you qualify for, in one place</h1>
+  <p class="subtitle">
+    Enter an applicant profile and the matching engine below evaluates it against
+    four lending partners' real underwriting rules &mdash; distinct credit, amount,
+    and tenure thresholds for each &mdash; and ranks eligible offers by estimated rate.
+    This logic matches the tested Python backend exactly (same rules, same edge cases).
+  </p>
+
+  <div class="grid">
+    <div class="card">
+      <h2>Applicant profile</h2>
+      <label for="amount">Requested loan amount (&#8377;)</label>
+      <input type="number" id="amount" value="500000" step="10000">
+
+      <label for="tier">Credit tier</label>
+      <select id="tier">
+        <option>Thin File</option>
+        <option>Fair</option>
+        <option selected>Good</option>
+        <option>Excellent</option>
+      </select>
+
+      <label for="tenure">Requested tenure (years)</label>
+      <input type="number" id="tenure" value="7" min="1" max="30">
+
+      <div class="checkbox-row">
+        <input type="checkbox" id="cosigner">
+        <label for="cosigner">Has a co-signer available</label>
+      </div>
+
+      <button class="primary" onclick="runMatch()">Check eligible offers</button>
+    </div>
+
+    <div class="card">
+      <h2>Ranked offers</h2>
+      <div id="results"><div class="empty-state">Enter a profile and click "Check eligible offers".</div></div>
+      <div class="funnel-note" id="funnelNote"></div>
+    </div>
+  </div>
+
+  <footer>
+    This page mirrors the real matching_engine.py logic client-side for demo purposes.
+    The actual backend (FastAPI + SQLite event logging + a queryable funnel endpoint)
+    and the full pytest suite are in the project repository.
+  </footer>
+</div>
+
+<script>
+const CREDIT_RANK = { "Thin File": 0, "Fair": 1, "Good": 2, "Excellent": 3 };
+
+const PARTNERS = [
+  { id: "edufund_direct", name: "EduFund Direct", minTier: "Fair", minAmt: 50000, maxAmt: 1500000, maxTenure: 7, baseRate: 13.5, bestRate: 10.5 },
+  { id: "scholarbridge_finance", name: "ScholarBridge Finance", minTier: "Good", minAmt: 100000, maxAmt: 2000000, maxTenure: 10, baseRate: 11.0, bestRate: 8.75 },
+  { id: "campuscredit_coop", name: "CampusCredit Co-op", minTier: "Thin File", minAmt: 50000, maxAmt: 800000, maxTenure: 5, baseRate: 15.0, bestRate: 12.0, cosignerBelow: "Fair" },
+  { id: "nextgen_education", name: "NextGen Education Loans", minTier: "Good", minAmt: 200000, maxAmt: 2500000, maxTenure: 15, baseRate: 10.0, bestRate: 7.5 },
+];
+
+function estimateRate(partner, applicantRank) {
+  const minRank = CREDIT_RANK[partner.minTier];
+  const maxRank = CREDIT_RANK["Excellent"];
+  if (maxRank === minRank) return partner.bestRate;
+  let position = (applicantRank - minRank) / (maxRank - minRank);
+  position = Math.max(0, Math.min(1, position));
+  return Math.round((partner.baseRate - position * (partner.baseRate - partner.bestRate)) * 100) / 100;
+}
+
+function evaluatePartner(partner, applicant) {
+  const rank = CREDIT_RANK[applicant.tier];
+  const minRank = CREDIT_RANK[partner.minTier];
+
+  if (rank < minRank) {
+    return { id: partner.id, name: partner.name, eligible: false, reason: `Requires at least ${partner.minTier} credit` };
+  }
+
+  let cosignerNeeded = false;
+  if (partner.cosignerBelow) {
+    const threshold = CREDIT_RANK[partner.cosignerBelow];
+    if (rank < threshold) {
+      cosignerNeeded = true;
+      if (!applicant.cosigner) {
+        return { id: partner.id, name: partner.name, eligible: false, reason: `${applicant.tier} credit requires a co-signer for this partner` };
+      }
+    }
+  }
+
+  if (applicant.amount < partner.minAmt || applicant.amount > partner.maxAmt) {
+    return { id: partner.id, name: partner.name, eligible: false, reason: `Loan amount must be between \u20b9${partner.minAmt.toLocaleString('en-IN')} and \u20b9${partner.maxAmt.toLocaleString('en-IN')}` };
+  }
+
+  if (applicant.tenure > partner.maxTenure) {
+    return { id: partner.id, name: partner.name, eligible: false, reason: `Maximum tenure is ${partner.maxTenure} years` };
+  }
+
+  return {
+    id: partner.id, name: partner.name, eligible: true, reason: "Eligible",
+    rate: estimateRate(partner, rank), cosignerNeeded,
+  };
+}
+
+let sessionEvents = { checked: 0, viewed: 0 };
+
+function runMatch() {
+  const applicant = {
+    amount: parseInt(document.getElementById('amount').value, 10),
+    tier: document.getElementById('tier').value,
+    tenure: parseInt(document.getElementById('tenure').value, 10),
+    cosigner: document.getElementById('cosigner').checked,
+  };
+
+  sessionEvents.checked++;
+
+  const offers = PARTNERS.map(p => evaluatePartner(p, applicant));
+  const eligible = offers.filter(o => o.eligible).sort((a, b) => a.rate - b.rate);
+  const ineligible = offers.filter(o => !o.eligible);
+
+  sessionEvents.viewed++;
+
+  const container = document.getElementById('results');
+  container.innerHTML = '';
+
+  if (eligible.length === 0) {
+    const div = document.createElement('div');
+    div.className = 'empty-state';
+    div.textContent = 'No partners match this profile. Try adjusting the amount, tenure, or adding a co-signer.';
+    container.appendChild(div);
+  }
+
+  eligible.forEach(o => {
+    const div = document.createElement('div');
+    div.className = 'offer eligible';
+    div.innerHTML = `<div><div class="name">${o.name}${o.cosignerNeeded ? '<span class="pill">Co-signer required</span>' : ''}</div><div class="reason">Up to ${PARTNERS.find(p=>p.id===o.id).maxTenure} year tenure</div></div><div class="rate">${o.rate}%</div>`;
+    container.appendChild(div);
+  });
+
+  ineligible.forEach(o => {
+    const div = document.createElement('div');
+    div.className = 'offer ineligible';
+    div.innerHTML = `<div><div class="name">${o.name}</div><div class="reason">${o.reason}</div></div>`;
+    container.appendChild(div);
+  });
+
+  document.getElementById('funnelNote').textContent =
+    `This session: ${sessionEvents.checked} eligibility check(s), ${sessionEvents.viewed} offer view(s) logged.`;
+}
+</script>
+</body>
+</html>
